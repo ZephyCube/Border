@@ -21,21 +21,26 @@ const PUSH_IN = 2;          // blocks inside the edge a pushed player lands
 const WALL_RANGE = 12;      // particle wall shows within this many blocks of an edge
 const WARN_COOLDOWN = 60;   // ticks between chat warnings per player
 
-// Default: 10,000 blocks in every direction from 0,0 in the Overworld, Nether and End.
+// Default: 10,000 blocks in every direction from 0,0 in the Overworld and End, 1,250 in the
+// Nether (1 Nether block = 8 Overworld blocks, so it covers the same area as the Overworld border).
 const DEFAULT_RADIUS = 10000;
+const NETHER_RADIUS = 1250;
 const defaultCfg = () => ({
     "minecraft:overworld": { x: 0, z: 0, r: DEFAULT_RADIUS },
-    "minecraft:nether": { x: 0, z: 0, r: DEFAULT_RADIUS },
+    "minecraft:nether": { x: 0, z: 0, r: NETHER_RADIUS },
     "minecraft:the_end": { x: 0, z: 0, r: DEFAULT_RADIUS },
 });
-// The default saved by versions before 1.1.4. A world still on exactly this value gets the new default.
-const OLD_DEFAULT = JSON.stringify({ "minecraft:overworld": { x: 0, z: 0, r: 35000 } });
+// Defaults saved by earlier versions. A world still on exactly one of these gets the current default.
+const OLD_DEFAULTS = [
+    JSON.stringify({ "minecraft:overworld": { x: 0, z: 0, r: 35000 } }), // before 1.1.4
+    JSON.stringify({ "minecraft:overworld": { x: 0, z: 0, r: 10000 }, "minecraft:nether": { x: 0, z: 0, r: 10000 }, "minecraft:the_end": { x: 0, z: 0, r: 10000 } }), // 1.1.4
+];
 let cfg = defaultCfg(); // used until the saved value is read
 // world properties cannot be read during early execution, so load on the first tick
 system.run(() => {
     const stored = world.getDynamicProperty(KEY);
-    if (stored === undefined || stored === OLD_DEFAULT) {
-        // first run, or a world still on the old default: 10,000 blocks from 0,0 in every dimension
+    if (stored === undefined || OLD_DEFAULTS.includes(stored)) {
+        // first run, or a world still on an old default
         cfg = defaultCfg();
         try { world.setDynamicProperty(KEY, JSON.stringify(cfg)); } catch { }
     } else {
