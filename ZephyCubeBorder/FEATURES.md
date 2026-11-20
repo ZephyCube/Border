@@ -1,4 +1,4 @@
-# ZephyCube Border 1.1.0
+# ZephyCube Border 1.1.4
 
 Square world border per dimension. Stable Script API only.
 
@@ -14,7 +14,7 @@ Turn any of these off or on without a restart: `/zc:bordermodules <module> off|o
 | `barrier_pearls` | Ender pearls cannot pass through barrier blocks (the pearl is removed and given back; if it landed first, the thrower is sent back) |
 | `spawn_area` | Keeps a 2-chunk ticking area (`zc_spawn`) at world spawn loaded, re-checked every 30 min |
 
-Default border: Overworld, 35,000 blocks in every direction from 0,0.
+Default border: Overworld, Nether and End, 10,000 blocks in every direction from 0,0 (x and z from -10,000 to 10,000). A world still on the old default (Overworld only, 35,000) is switched to this on first load; a border set with `/zc:border` is kept.
 
 ## Commands
 | Command | Who | Use |
@@ -29,6 +29,7 @@ Default border: Overworld, 35,000 blocks in every direction from 0,0.
 | Tag | Effect |
 | --- | --- |
 | `zc:border_bypass` | Ignores the border (also in the AdminTools permission bitmask `zc:p.<hex>`, bit 8) |
+
 Spectators are always exempt.
 
 ## Storage
