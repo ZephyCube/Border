@@ -1,6 +1,6 @@
 <p align="center"><img src="logo.png" alt="ZephyCube" width="160"></p>
 
-# ZephyCubeBorder v1.1.4
+# ZephyCubeBorder v1.1.5
 
 Square world border per dimension. Stable Script API only.
 
@@ -9,7 +9,7 @@ Square world border per dimension. Stable Script API only.
 
 ## Install
 
-Download `ZephyCubeBorder-v1.1.4-BP.mcaddon` (behavior pack; this add-on has no resource pack) or `ZephyCubeBorder-v1.1.4.mcpack` from the Releases page and open it. Or install by hand: copy the `ZephyCubeBorder` folder into your world's `behavior_packs` folder and add its `uuid` and `version` (from `manifest.json`) to the world's `world_behavior_packs.json`. Needs `@minecraft/server` 2.8.0.
+Download `ZephyCubeBorder-v1.1.5-BP.mcaddon` (behavior pack; this add-on has no resource pack) or `ZephyCubeBorder-v1.1.5.mcpack` from the Releases page and open it. Or install by hand: copy the `ZephyCubeBorder` folder into your world's `behavior_packs` folder and add its `uuid` and `version` (from `manifest.json`) to the world's `world_behavior_packs.json`. Needs `@minecraft/server` 2.8.0.
 
 ## Features (modules)
 Turn any of these off or on without a restart: `/zc:bordermodules <module> off|on` (no argument lists them). The choice is saved in the world.
@@ -23,7 +23,7 @@ Turn any of these off or on without a restart: `/zc:bordermodules <module> off|o
 | `barrier_pearls` | Ender pearls cannot pass through barrier blocks (the pearl is removed and given back; if it landed first, the thrower is sent back) |
 | `spawn_area` | Keeps a 2-chunk ticking area (`zc_spawn`) at world spawn loaded, re-checked every 30 min |
 
-Default border: Overworld, Nether and End, 10,000 blocks in every direction from 0,0 (x and z from -10,000 to 10,000). A world still on the old default (Overworld only, 35,000) is switched to this on first load; a border set with `/zc:border` is kept.
+Default border, all centred on 0,0: Overworld and End 10,000 blocks in every direction (x and z from -10,000 to 10,000), Nether 1,250 blocks (the same area, since 1 Nether block is 8 Overworld blocks). A world still on an earlier default (Overworld only at 35,000 from before 1.1.4, or 10,000 in every dimension from 1.1.4) is switched to this on first load; a border set with `/zc:border` is kept.
 
 ## Commands
 | Command | Who | Use |
