@@ -1,0 +1,46 @@
+{
+  "format_version": 2,
+  "header": {
+    "name": "ZephyCube Border",
+    "description": "Square world border, keeps the world spawn loaded, ender pearls cannot pass barriers.",
+    "uuid": "c7e93368-bfec-50b9-a50d-3ec17faa6dd0",
+    "version": [
+      1,
+      0,
+      5
+    ],
+    "min_engine_version": [
+      1,
+      21,
+      0
+    ]
+  },
+  "modules": [
+    {
+      "type": "data",
+      "uuid": "b7443511-be8f-50d2-bbca-911cb1e45392",
+      "version": [
+        1,
+        0,
+        5
+      ]
+    },
+    {
+      "type": "script",
+      "language": "javascript",
+      "uuid": "321406ad-fba0-5bd4-a59e-41a6112228ae",
+      "entry": "scripts/main.js",
+      "version": [
+        1,
+        0,
+        5
+      ]
+    }
+  ],
+  "dependencies": [
+    {
+      "module_name": "@minecraft/server",
+      "version": "2.8.0"
+    }
+  ]
+}
