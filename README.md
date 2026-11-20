@@ -9,7 +9,7 @@ Square world border per dimension. Stable Script API only.
 
 ## Install
 
-Download `ZephyCubeBorder-v1.1.4.mcpack` from the Releases page and open it. Or install by hand: copy the `ZephyCubeBorder` folder into your world's `behavior_packs` folder and add its `uuid` and `version` (from `manifest.json`) to the world's `world_behavior_packs.json`. Needs `@minecraft/server` 2.8.0.
+Download `ZephyCubeBorder-v1.1.4-BP.mcaddon` (behavior pack; this add-on has no resource pack) or `ZephyCubeBorder-v1.1.4.mcpack` from the Releases page and open it. Or install by hand: copy the `ZephyCubeBorder` folder into your world's `behavior_packs` folder and add its `uuid` and `version` (from `manifest.json`) to the world's `world_behavior_packs.json`. Needs `@minecraft/server` 2.8.0.
 
 ## Features (modules)
 Turn any of these off or on without a restart: `/zc:bordermodules <module> off|on` (no argument lists them). The choice is saved in the world.
