@@ -1,3 +1,4 @@
+import "./style.js";
 import {
     world, system, GameMode, ItemStack, Player,
     CommandPermissionLevel, CustomCommandStatus, CustomCommandParamType
