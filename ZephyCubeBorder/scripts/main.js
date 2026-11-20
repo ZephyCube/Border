@@ -21,12 +21,22 @@ const PUSH_IN = 2;          // blocks inside the edge a pushed player lands
 const WALL_RANGE = 12;      // particle wall shows within this many blocks of an edge
 const WARN_COOLDOWN = 60;   // ticks between chat warnings per player
 
-let cfg = { "minecraft:overworld": { x: 0, z: 0, r: 35000 } }; // used until the saved value is read
+// Default: 10,000 blocks in every direction from 0,0 in the Overworld, Nether and End.
+const DEFAULT_RADIUS = 10000;
+const defaultCfg = () => ({
+    "minecraft:overworld": { x: 0, z: 0, r: DEFAULT_RADIUS },
+    "minecraft:nether": { x: 0, z: 0, r: DEFAULT_RADIUS },
+    "minecraft:the_end": { x: 0, z: 0, r: DEFAULT_RADIUS },
+});
+// The default saved by versions before 1.1.4. A world still on exactly this value gets the new default.
+const OLD_DEFAULT = JSON.stringify({ "minecraft:overworld": { x: 0, z: 0, r: 35000 } });
+let cfg = defaultCfg(); // used until the saved value is read
 // world properties cannot be read during early execution, so load on the first tick
 system.run(() => {
     const stored = world.getDynamicProperty(KEY);
-    if (stored === undefined) {
-        // first run: Overworld border of 35,000 blocks from 0,0 (x and z from -35000 to 35000)
+    if (stored === undefined || stored === OLD_DEFAULT) {
+        // first run, or a world still on the old default: 10,000 blocks from 0,0 in every dimension
+        cfg = defaultCfg();
         try { world.setDynamicProperty(KEY, JSON.stringify(cfg)); } catch { }
     } else {
         try { cfg = JSON.parse(stored) || {}; } catch { cfg = {}; }
