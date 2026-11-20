@@ -2,8 +2,18 @@ import {
     world, system, GameMode, ItemStack, Player,
     CommandPermissionLevel, CustomCommandStatus, CustomCommandParamType
 } from '@minecraft/server';
+import { defineModules } from './modules.js';
 
 // ZephyCube Border: square world border per dimension. Stable API only.
+// Modules (turn parts off with /zc:bordermodules <module> off):
+const on = defineModules("wb", "zc:bordermodules", "Border", [
+    { key: "push", label: "push players back at the border" },
+    { key: "wall", label: "blue particle wall near the edge" },
+    { key: "build", label: "no placing or breaking blocks beyond the border" },
+    { key: "pearls", label: "ender pearls beyond the border are removed" },
+    { key: "barrier_pearls", label: "ender pearls cannot pass through barrier blocks" },
+    { key: "spawn_area", label: "keep the world spawn area loaded (ticking area)" },
+]);
 const KEY = "wb:cfg";
 const BYPASS_TAG = "zc:border_bypass";
 const PUSH_IN = 2;          // blocks inside the edge a pushed player lands
@@ -28,9 +38,18 @@ const DIM_NAMES = { "minecraft:overworld": "Overworld", "minecraft:nether": "Net
 
 const outside = (b, x, z) => Math.abs(x - b.x) > b.r || Math.abs(z - b.z) > b.r;
 
+
+// Bypass/alert tags: the single tag (e.g. zc:border_bypass) or the AdminTools bitmask tag zc:p.<hex> (bit 8 = border_bypass).
+function hasPermTag(player, key, bit) {
+    if (player.hasTag("zc:" + key)) return true;
+    for (const t of player.getTags()) {
+        if (t.startsWith("zc:p.")) return ((parseInt(t.slice(5), 16) >> bit) & 1) === 1;
+    }
+    return false;
+}
 function exempt(player) {
     try {
-        if (player.hasTag(BYPASS_TAG)) return true;
+        if (hasPermTag(player, "border_bypass", 8)) return true;
         return player.getGameMode() === GameMode.Spectator;
     } catch { return true; }
 }
@@ -84,6 +103,7 @@ system.beforeEvents.startup.subscribe((init) => {
 
 // ---- enforcement: push back
 system.runInterval(() => {
+    if (!on("push")) return;
     for (const player of world.getAllPlayers()) {
         try {
             if (!player.isValid) continue;
@@ -106,6 +126,7 @@ system.runInterval(() => {
 
 // ---- particle wall near the edge
 system.runInterval(() => {
+    if (!on("wall")) return;
     for (const player of world.getAllPlayers()) {
         try {
             const dim = player.dimension;
@@ -136,6 +157,7 @@ system.runInterval(() => {
 
 // ---- nothing placed / broken / pearled beyond the border
 world.beforeEvents.playerBreakBlock.subscribe((ev) => {
+    if (!on("build")) return;
     const b = cfg[ev.player.dimension.id];
     if (!b || exempt(ev.player)) return;
     const l = ev.block.location;
@@ -146,6 +168,7 @@ world.beforeEvents.playerBreakBlock.subscribe((ev) => {
 });
 
 world.afterEvents.playerPlaceBlock.subscribe((ev) => {
+    if (!on("build")) return;
     const player = ev.player;
     const b = cfg[player.dimension.id];
     if (!b || exempt(player)) return;
@@ -168,6 +191,7 @@ world.afterEvents.playerPlaceBlock.subscribe((ev) => {
 });
 
 system.runInterval(() => {
+    if (!on("pearls")) return;
     for (const dimId of Object.keys(cfg)) {
         const b = cfg[dimId];
         try {
@@ -187,6 +211,7 @@ world.afterEvents.playerLeave.subscribe((ev) => { lastWarn.delete(ev.playerId); 
 // ---- World spawn stays loaded (ticking area), so spawn holograms / leaderboards keep updating with nobody near ----
 const SPAWN_AREA = { name: "zc_spawn", radiusChunks: 2 };     // circle radius 1-4 chunks
 function keepSpawnLoaded() {
+    if (!on("spawn_area")) return;
     try {
         const s = world.getDefaultSpawnLocation();
         const dim = world.getDimension("minecraft:overworld");
@@ -214,7 +239,7 @@ const pearls = new Map();      // entity id -> { e, last:{x,y,z}, owner, ownerLa
 world.afterEvents.entitySpawn.subscribe((ev) => {
     try {
         const e = ev.entity;
-        if (e.typeId !== PEARL || pearls.size > 100) return;
+        if (!on("barrier_pearls") || e.typeId !== PEARL || pearls.size > 100) return;
         const l = e.location;
         const rec = { e, last: { x: l.x, y: l.y, z: l.z }, owner: null, ownerLast: null, dimId: e.dimension.id };
         try { rec.owner = e.getComponent("minecraft:projectile")?.owner ?? null; } catch { }
@@ -246,7 +271,7 @@ function giveBack(owner) {
 }
 
 system.runInterval(() => {
-    if (!pearls.size) return;
+    if (!pearls.size || !on("barrier_pearls")) return;
     for (const [id, p] of pearls) {
         try {
             const e = p.e;
@@ -266,6 +291,7 @@ system.runInterval(() => {
 }, 1);
 
 function onPearlHit(ev) {
+    if (!on("barrier_pearls")) return;
     try {
         const proj = ev.projectile;
         if (proj.typeId !== PEARL) return;
