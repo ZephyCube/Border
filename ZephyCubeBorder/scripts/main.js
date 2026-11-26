@@ -6,14 +6,14 @@ import {
 import { defineModules } from './modules.js';
 
 // ZephyCube Border: square world border per dimension. Stable API only.
-// Modules (turn parts off with /zc:bordermodules <module> off):
+// Always on: players outside the border are teleported back inside (except players with the bypass tag), and the
+// world spawn is kept loaded with a ticking area.
+// Modules (turn parts off with /zc:bordermodules, or /zc:bordermodules <module> off):
 const on = defineModules("wb", "zc:bordermodules", "Border", [
-    { key: "push", label: "push players back at the border" },
     { key: "wall", label: "blue particle wall near the edge" },
     { key: "build", label: "no placing or breaking blocks beyond the border" },
     { key: "pearls", label: "ender pearls beyond the border are removed" },
     { key: "barrier_pearls", label: "ender pearls cannot pass through barrier blocks" },
-    { key: "spawn_area", label: "keep the world spawn area loaded (ticking area)" },
 ]);
 const KEY = "wb:cfg";
 const BYPASS_TAG = "zc:border_bypass";
@@ -117,14 +117,14 @@ system.beforeEvents.startup.subscribe((init) => {
     });
 });
 
-// ---- enforcement: push back
+// ---- enforcement: players outside are always teleported back inside. Only the bypass tag exempts a player.
+const canPassBorder = (player) => { try { return hasPermTag(player, "border_bypass", 8); } catch { return true; } };
 system.runInterval(() => {
-    if (!on("push")) return;
     for (const player of world.getAllPlayers()) {
         try {
             if (!player.isValid) continue;
             const b = cfg[player.dimension.id];
-            if (!b || exempt(player)) continue;
+            if (!b || canPassBorder(player)) continue;
             const { x, y, z } = player.location;
             if (!outside(b, x, z)) continue;
             const lim = b.r - PUSH_IN;
@@ -225,9 +225,9 @@ system.runInterval(() => {
 world.afterEvents.playerLeave.subscribe((ev) => { lastWarn.delete(ev.playerId); });
 
 // ---- World spawn stays loaded (ticking area), so spawn holograms / leaderboards keep updating with nobody near ----
+// Always on: Bedrock does not keep the spawn chunks loaded by itself (unlike Java), only a ticking area does.
 const SPAWN_AREA = { name: "zc_spawn", radiusChunks: 2 };     // circle radius 1-4 chunks
 function keepSpawnLoaded() {
-    if (!on("spawn_area")) return;
     try {
         const s = world.getDefaultSpawnLocation();
         const dim = world.getDimension("minecraft:overworld");
