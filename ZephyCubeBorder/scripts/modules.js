@@ -6,6 +6,8 @@
 // Operators only.
 // Optional extra switches (settings that are not a whole module) can be added to the same menu:
 //   defineModules(ns, command, title, defs, [{ label, tooltip, get: () => bool, set: (bool) => void }])
+// A module with defaultOff: true starts off until it is turned on (saved as "+key").
+// A module with a name is shown by that name in the menu (the key is what the command uses).
 import { world, system, CommandPermissionLevel, CustomCommandStatus, CustomCommandParamType } from "@minecraft/server";
 import { ModalFormData, FormCancelationReason } from "@minecraft/server-ui";
 
@@ -22,20 +24,27 @@ export async function showForm(player, form) {
 
 export function defineModules(ns, command, title, defs, extras = []) {
     const KEY = `${ns}:modules`;
-    const off = new Set();
+    const defaultOff = new Set(defs.filter((d) => d.defaultOff).map((d) => d.key));
+    const off = new Set(defaultOff);
     const known = new Set(defs.map((d) => d.key));
     system.run(() => {
         try {
             const s = world.getDynamicProperty(KEY);
-            if (typeof s === "string") for (const k of JSON.parse(s)) if (known.has(k)) off.add(k);
+            if (typeof s === "string") for (const k of JSON.parse(s)) {
+                if (known.has(k)) off.add(k);
+                else if (k.startsWith("+") && known.has(k.slice(1))) off.delete(k.slice(1));
+            }
         } catch { }
     });
-    const save = () => { try { world.setDynamicProperty(KEY, JSON.stringify([...off])); } catch { } };
-    const list = () => defs.map((d) => `§7- §f${d.key} ${off.has(d.key) ? "§coff" : "§aon"}§7: ${d.label}`).join("\n");
+    const save = () => {
+        const v = [...[...off].filter((k) => !defaultOff.has(k)), ...[...defaultOff].filter((k) => !off.has(k)).map((k) => "+" + k)];
+        try { world.setDynamicProperty(KEY, JSON.stringify(v)); } catch { }
+    };
+    const list = () => defs.map((d) => `§7- §f${d.key} ${off.has(d.key) ? "§coff" : "§aon"}§7: ${d.name ? d.name + ", " : ""}${d.label}`).join("\n");
 
     async function openMenu(player) {
         const form = new ModalFormData().title(`${title} modules`);
-        for (const d of defs) form.toggle(d.key, { defaultValue: !off.has(d.key), tooltip: d.label });
+        for (const d of defs) form.toggle(d.name ?? d.key, { defaultValue: !off.has(d.key), tooltip: d.name ? `${d.label} (/${command} ${d.key} on|off)` : d.label });
         for (const x of extras) form.toggle(x.label, { defaultValue: x.get() === true, tooltip: x.tooltip });
         form.submitButton("Save");
         const r = await showForm(player, form);
@@ -48,7 +57,7 @@ export function defineModules(ns, command, title, defs, extras = []) {
             const on = vals[i];
             if (on === !off.has(d.key)) return;
             if (on) off.delete(d.key); else off.add(d.key);
-            changed.push(`${d.key} ${on ? "§aon" : "§coff"}§r`);
+            changed.push(`${d.name ?? d.key} ${on ? "§aon" : "§coff"}§r`);
         });
         extras.forEach((x, i) => {
             const v = vals[defs.length + i];
