@@ -10,10 +10,10 @@ import { defineModules } from './modules.js';
 // world spawn is kept loaded with a ticking area.
 // Modules (turn parts off with /zc:bordermodules, or /zc:bordermodules <module> off):
 const on = defineModules("wb", "zc:bordermodules", "Border", [
-    { key: "wall", label: "blue particle wall near the edge" },
-    { key: "build", label: "no placing or breaking blocks beyond the border" },
-    { key: "pearls", label: "ender pearls beyond the border are removed" },
-    { key: "barrier_pearls", label: "ender pearls cannot pass through barrier blocks" },
+    { key: "wall", name: "Particle wall", label: "blue particle wall near the edge" },
+    { key: "build", name: "No building beyond the border", label: "no placing or breaking blocks beyond the border" },
+    { key: "pearls", name: "No ender pearls beyond the border", label: "ender pearls beyond the border are removed" },
+    { key: "barrier_pearls", name: "No ender pearls through barriers", label: "ender pearls cannot pass through barrier blocks" },
 ]);
 const KEY = "wb:cfg";
 const BYPASS_TAG = "zc:border_bypass";

@@ -1,6 +1,6 @@
 <p align="center"><img src="logo.png" alt="ZephyCube" width="160"></p>
 
-# ZephyCubeBorder v1.2.0
+# ZephyCubeBorder v1.2.1
 
 Square world border per dimension. Stable Script API only.
 
@@ -9,7 +9,7 @@ Square world border per dimension. Stable Script API only.
 
 ## Install
 
-Download `ZephyCubeBorder-v1.2.0-BP.mcaddon` (behavior pack; this add-on has no resource pack) or `ZephyCubeBorder-v1.2.0.mcpack` from the Releases page and open it. Or install by hand: copy the `ZephyCubeBorder` folder into your world's `behavior_packs` folder and add its `uuid` and `version` (from `manifest.json`) to the world's `world_behavior_packs.json`. Needs `@minecraft/server` 2.8.0 and `@minecraft/server-ui` 2.0.0.
+Download `ZephyCubeBorder-v1.2.1-BP.mcaddon` (behavior pack; this add-on has no resource pack) or `ZephyCubeBorder-v1.2.1.mcpack` from the Releases page and open it. Or install by hand: copy the `ZephyCubeBorder` folder into your world's `behavior_packs` folder and add its `uuid` and `version` (from `manifest.json`) to the world's `world_behavior_packs.json`. Needs `@minecraft/server` 2.8.0 and `@minecraft/server-ui` 2.0.0.
 
 ## Always on
 * **Border enforcement:** a player outside the border is teleported back inside (2 blocks in) with a chat warning. Only players with the bypass tag (see Tags) can cross it; this includes spectators and operators without the tag.
@@ -20,10 +20,10 @@ Download `ZephyCubeBorder-v1.2.0-BP.mcaddon` (behavior pack; this add-on has no 
 
 | Module | What it does |
 | --- | --- |
-| `wall` | Blue flame particle wall within 12 blocks of an edge |
-| `build` | Blocks placing and breaking blocks beyond the border (placed blocks are removed and the item returned) |
-| `pearls` | Ender pearls that land beyond the border are removed |
-| `barrier_pearls` | Ender pearls cannot pass through barrier blocks (the pearl is removed and given back; if it landed first, the thrower is sent back) |
+| Particle wall (`wall`) | Blue flame particle wall within 12 blocks of an edge |
+| No building beyond the border (`build`) | Blocks placing and breaking blocks beyond the border (placed blocks are removed and the item returned) |
+| No ender pearls beyond the border (`pearls`) | Ender pearls that land beyond the border are removed |
+| No ender pearls through barriers (`barrier_pearls`) | Ender pearls cannot pass through barrier blocks (the pearl is removed and given back; if it landed first, the thrower is sent back) |
 
 Default border, all centred on 0,0: Overworld and End 10,000 blocks in every direction (x and z from -10,000 to 10,000), Nether 1,250 blocks (the same area, since 1 Nether block is 8 Overworld blocks). A world still on an earlier default (Overworld only at 35,000 from before 1.1.4, or 10,000 in every dimension from 1.1.4) is switched to this on first load; a border set with `/zc:border` is kept.
 
